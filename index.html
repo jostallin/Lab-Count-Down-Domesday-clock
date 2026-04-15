@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab Doomsday Clock - Hours Edition</title>
+    <title>Lab Doomsday Clock - DMACC Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap');
@@ -102,7 +102,10 @@
     <!-- SETUP VIEW -->
     <div id="setup-view" class="w-full max-w-3xl glass-panel p-8 space-y-6 my-auto">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-white/10 pb-4 gap-4">
-            <h1 class="text-3xl font-bold tracking-tight">Lab Clock Setup</h1>
+            <div class="flex items-center gap-4">
+                <div class="bg-blue-600 px-3 py-1 rounded font-bold text-sm">DMACC</div>
+                <h1 class="text-3xl font-bold tracking-tight">Spring 2026 Lab Setup</h1>
+            </div>
             <div class="flex gap-2">
                 <button onclick="exportConfig()" class="btn-secondary px-3 py-1 rounded text-xs uppercase tracking-widest text-white/60">Save Config</button>
                 <button onclick="document.getElementById('import-input').click()" class="btn-secondary px-3 py-1 rounded text-xs uppercase tracking-widest text-white/60">Load Config</button>
@@ -116,19 +119,27 @@
                 <input type="datetime-local" id="machine-deadline" class="w-full p-3 rounded-lg">
             </div>
             <div>
-                <label class="block text-sm font-medium mb-2 text-blue-400">Semester End</label>
+                <label class="block text-sm font-medium mb-2 text-blue-400">Semester End (Spring 2026)</label>
                 <input type="datetime-local" id="semester-deadline" class="w-full p-3 rounded-lg">
             </div>
         </div>
 
-        <div class="p-4 bg-white/5 rounded-xl border border-white/10">
-            <label class="block text-xs font-bold uppercase text-white/40 mb-2">Security: Control Panel Password</label>
-            <input type="text" id="admin-pass" placeholder="Set password for settings" class="w-full p-2 rounded-lg text-sm">
-            <p class="text-[10px] mt-2 text-white/30 italic">Note: This is saved in your JSON file. Keep it simple.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-4 bg-white/5 rounded-xl border border-white/10">
+                <label class="block text-xs font-bold uppercase text-white/40 mb-2">Security: Control Panel Password</label>
+                <input type="text" id="admin-pass" placeholder="Set password" class="w-full p-2 rounded-lg text-sm">
+            </div>
+            <div class="p-4 bg-blue-900/10 rounded-xl border border-blue-500/20">
+                <label class="block text-xs font-bold uppercase text-blue-400 mb-2">DMACC Quick Links</label>
+                <div class="flex flex-col gap-1 text-[10px] uppercase font-bold tracking-tighter">
+                    <a href="https://www.dmacc.edu/calendar/index.html" target="_blank" class="text-white/60 hover:text-white underline">Academic Calendar</a>
+                    <a href="https://catalog.dmacc.edu/" target="_blank" class="text-white/60 hover:text-white underline">Course Catalog</a>
+                </div>
+            </div>
         </div>
 
         <div class="space-y-4">
-            <h2 class="text-xl font-semibold">Weekly Schedule</h2>
+            <h2 class="text-xl font-semibold">Weekly Lab Schedule</h2>
             <div id="schedule-container" class="space-y-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar"></div>
         </div>
 
@@ -158,7 +169,7 @@
                 <div class="text-[0.6rem] uppercase tracking-widest mb-4 opacity-60 text-blue-400">Potential Bonus Hours</div>
                 <div class="flex items-baseline justify-center gap-2">
                     <span id="bonus-hours" class="text-8xl md:text-9xl font-bold digital-font glow-blue text-blue-500">00</span>
-                    <span class="text-2xl digital-font text-blue-900">HRS</span>
+                    <span class="text-2xl digital-font text-red-900 opacity-20">BONUS</span>
                 </div>
             </div>
         </div>
@@ -179,11 +190,21 @@
 
     <script>
         const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        
+        // Updated Spring 2026 Schedule: Adv Die Making Lab (Mon-Thu 12:00-14:50)
         let config = {
-            password: '',
-            machineDeadline: null,
-            semesterDeadline: null,
-            schedule: daysOfWeek.map(day => ({ day, active: false, name: '', start: '08:00', end: '12:00', type: 'class' }))
+            password: 'dmacc',
+            machineDeadline: '2026-05-01T17:00', 
+            semesterDeadline: '2026-05-07T23:59', 
+            schedule: [
+                { day: 'Sunday', active: false, name: '', start: '08:00', end: '12:00', type: 'class' },
+                { day: 'Monday', active: true, name: 'Adv Die Making Lab', start: '12:00', end: '14:50', type: 'class' },
+                { day: 'Tuesday', active: true, name: 'Adv Die Making Lab', start: '12:00', end: '14:50', type: 'class' },
+                { day: 'Wednesday', active: true, name: 'Adv Die Making Lab', start: '12:00', end: '14:50', type: 'class' },
+                { day: 'Thursday', active: true, name: 'Adv Die Making Lab', start: '12:00', end: '14:50', type: 'class' },
+                { day: 'Friday', active: true, name: 'Open Lab Bonus', start: '08:00', end: '16:00', type: 'bonus' },
+                { day: 'Saturday', active: false, name: '', start: '08:00', end: '12:00', type: 'class' }
+            ]
         };
 
         function init() {
@@ -209,6 +230,8 @@
                 container.appendChild(div);
             });
             document.getElementById('admin-pass').value = config.password;
+            document.getElementById('machine-deadline').value = config.machineDeadline;
+            document.getElementById('semester-deadline').value = config.semesterDeadline;
         }
 
         function updateSchedule(index, field, value) { config.schedule[index][field] = value; }
@@ -218,7 +241,7 @@
             config.semesterDeadline = document.getElementById('semester-deadline').value;
             config.password = document.getElementById('admin-pass').value;
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(config));
-            const a = document.createElement('a'); a.href = dataStr; a.download = "lab_clock_config.json"; a.click();
+            const a = document.createElement('a'); a.href = dataStr; a.download = "dmacc_td_advlab_config.json"; a.click();
         }
 
         function importConfig(event) {
@@ -226,7 +249,12 @@
             if (!file) return;
             const reader = new FileReader();
             reader.onload = (e) => {
-                try { config = JSON.parse(e.target.result); init(); } catch { alert("Invalid file"); }
+                try { 
+                    config = JSON.parse(e.target.result); 
+                    init(); 
+                } catch { 
+                    alert("Invalid file format."); 
+                }
             };
             reader.readAsText(file);
         }
@@ -309,14 +337,15 @@
 
             const totalHours = classH + bonusH;
             const mainTitle = document.getElementById('main-title');
-            if (totalHours < 10) {
-                document.body.style.setProperty('--intensity', '1');
+            if (totalHours < 15) {
+                document.body.style.setProperty('--intensity', (20 - totalHours) / 5);
                 document.body.classList.add('doom-shake');
                 document.getElementById('doom-overlay').style.display = 'block';
-                mainTitle.innerText = "TIME IS RUNNING OUT";
+                mainTitle.innerText = "CRITICAL TIME REMAINING";
             } else {
                 document.body.classList.remove('doom-shake');
                 document.getElementById('doom-overlay').style.display = 'none';
+                mainTitle.innerText = "Productive Time Remaining";
             }
 
             const diff = machineTarget - now;
